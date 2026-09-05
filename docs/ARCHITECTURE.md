@@ -18,6 +18,9 @@ This document captures the communication architecture, operational flow, and pay
 [ Python FastAPI Engine ] ◄───────► [ Local Ollama Service (llama3.2:3b) ]
 ```
 
+The model can be changed with `OLLAMA_MODEL`. Calls time out after 120 seconds
+by default; override this with `OLLAMA_TIMEOUT_SECONDS` when needed.
+
 ---
 
 ## 2. Core Architectural Principle
@@ -39,7 +42,8 @@ Triggered by the Express gateway when processing a developer workspace commit su
 ```json
 {
   "diff": "String containing the standard git diff content showing line removals and additions.",
-  "commit_message": "The original developer-provided commit string description."
+  "commit_message": "The original developer-provided commit string description.",
+  "stat_summary": "Optional deterministic git --stat output."
 }
 ```
 
@@ -53,14 +57,13 @@ Matches the exact Phase 1 structural output contract:
 ```json
 {
   "summary": "High-level summary text synthesizing the intent and impact of the changes.",
-  "change_type": "architecture_change | feature | bugfix | refactor | chore | docs",
-  "affected_components": [
-    "model",
-    "training",
-    "frontend",
-    "backend"
+  "changed_components": [
+    "src/model.py",
+    "src/train.py"
   ],
-  "documentation_impact": true
+  "change_type": "feature | bugfix | refactor | docs | test | chore",
+  "risk_level": "low | medium | high",
+  "reasoning": "Brief evidence-based justification for the classification and risk."
 }
 ```
 
